@@ -27,7 +27,7 @@ contract Dex {
         bytes3 ticker,
         string memory tokenName,
         address tokenAddress
-    ) external isTokenNotExist(ticker) isOwner {
+    ) external isTickerAvailable(ticker) isOwner {
         token memory newToken = token(ticker, tokenName, tokenAddress);
         tokens[ticker] = newToken;
         tokensList.push(ticker);
@@ -36,7 +36,10 @@ contract Dex {
     mapping(address => mapping(bytes3 => uint256)) tradersBalances;
 
     // confusion
-    function deposit(bytes3 ticker, uint256 amount) external {
+    function deposit(bytes3 ticker, uint256 amount)
+        external
+        isTokenExist(ticker)
+    {
         IERC20(tokens[ticker].tokenAddress).transferFrom(
             msg.sender,
             address(this),
@@ -47,7 +50,10 @@ contract Dex {
         tradersBalances[msg.sender][ticker] += amount;
     }
 
-    function withdraw(bytes3 ticker, uint256 amount) external {
+    function withdraw(bytes3 ticker, uint256 amount)
+        external
+        isTokenExist(ticker)
+    {
         require(
             tradersBalances[msg.sender][ticker] >= amount,
             "Insufficient balance"
@@ -59,10 +65,15 @@ contract Dex {
         tradersBalances[msg.sender][ticker] -= amount;
     }
 
-    modifier isTokenNotExist(bytes3 ticker) {
+    modifier isTokenExist(bytes3 ticker) {
+        require(tokens[ticker].ticker != bytes3(0), "The token does not exist");
+        _;
+    }
+
+    modifier isTickerAvailable(bytes3 ticker) {
         require(
-            tokens[ticker].ticker != bytes3(0),
-            "The token ticker already exist"
+            tokens[ticker].ticker == bytes3(0),
+            "The ticker is already taken"
         );
         _;
     }
