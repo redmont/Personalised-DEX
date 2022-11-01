@@ -9,6 +9,8 @@ contract OrdersManagement is Helper, traders {
     /* This contract has following functionalities
      1. Create Limit order
      2. Create Market order
+     3. Update order book
+     4. update trader balances
      */
 
     enum Side {
@@ -156,6 +158,14 @@ contract OrdersManagement is Helper, traders {
             // if buy order, iterate to right and vice versa
             side == Side.BUY ? i++ : i--;
         }
+    }
+
+    function getOrders(bytes32 ticker, Side side)
+        external
+        view
+        returns (Order[] memory)
+    {
+        return OrderBook[ticker][side];
     }
 
     // Remove orders that are filled from order book
