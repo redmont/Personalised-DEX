@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./baseContract.sol";
 
-contract traders is Helper {
+contract Traders is Helper {
     /* This contract has following functionalities
      1. Create Limit order
      2. Create Market order

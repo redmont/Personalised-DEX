@@ -3,8 +3,10 @@
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./baseContract.sol";
+import "./Orders.sol";
+import "./Traders.sol";
 
-contract Dex is Helper {
+contract Dex is Helper, Traders, OrdersManagement {
     /* This contract has following functionalities
      1. Create new tokens
      2. Deposit/Withdraw Token 
@@ -23,8 +25,6 @@ contract Dex is Helper {
         tokens[ticker] = newToken;
         tokensList.push(ticker);
     }
-
-    mapping(address => mapping(bytes32 => uint256)) tradersBalances;
 
     // confusion
     function deposit(bytes32 ticker, uint256 amount)

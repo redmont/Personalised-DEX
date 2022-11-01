@@ -2,10 +2,11 @@
 
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import "./baseContract.sol";
 import "./Traders.sol";
 
-contract OrdersManagement is Helper, traders {
+contract OrdersManagement is Helper, Traders {
     /* This contract has following functionalities
      1. Create Limit order
      2. Create Market order
@@ -37,6 +38,7 @@ contract OrdersManagement is Helper, traders {
         uint256 averagePrice,
         uint256 filled
     );
+    event log(uint256 c);
 
     mapping(bytes32 => mapping(Side => Order[])) OrderBook;
 
@@ -103,10 +105,10 @@ contract OrdersManagement is Helper, traders {
         // orders is an ascending array
         // If buy order, then we interseted in lowest price. left to right in the array
         // If sell order, then we interseted in highest price. right to left in the array
-
-        Order[] storage orders = OrderBook[ticker][side];
-
-        uint256 tradeRemainingToBefilled;
+        Order[] storage orders = OrderBook[ticker][
+            side == Side.BUY ? Side.SELL : Side.BUY
+        ];
+        uint256 tradeRemainingToBefilled = amount;
         int256 i = (side == Side.BUY) ? int256(0) : int256(orders.length) - 1;
 
         // to calculate average price
@@ -129,16 +131,17 @@ contract OrdersManagement is Helper, traders {
                 processAmount = availableCurrentOrder;
             }
 
-            // Now we know the price, checking if trader have enough DAI
-            uint256 DaiRequired = processAmount * currentOrder.price;
-            require(
-                tradersBalances[msg.sender][DAI] >= DaiRequired,
-                "Not enough DAI"
-            );
+            if (side == Side.BUY) {
+                // Now we know the price, checking if trader have enough DAI
+                uint256 DaiRequired = processAmount * currentOrder.price;
+                require(
+                    tradersBalances[msg.sender][DAI] >= DaiRequired,
+                    "Not enough DAI"
+                );
+            }
 
             // upadate order book
             orders[uint256(i)].filledAmount += tradeRemainingToBefilled;
-            tradeRemainingToBefilled = 0;
 
             if (side == Side.BUY) {
                 // update market order trader's balance
@@ -175,11 +178,22 @@ contract OrdersManagement is Helper, traders {
             // if buy order, iterate to right and vice versa
             side == Side.BUY ? i++ : i--;
         }
+        //require(0 == 1, Strings.toString(totalTrades));
 
-        uint256 filled = ((amount - tradeRemainingToBefilled) * 100) / amount;
-        uint256 averagePrice = totalPrice / totalTrades;
+        if (totalTrades > 0) {
+            uint256 filled = ((amount - tradeRemainingToBefilled) * 100) /
+                amount;
+            uint256 averagePrice = totalPrice / totalTrades;
 
-        emit NewTrade(msg.sender, ticker, side, amount, averagePrice, filled);
+            emit NewTrade(
+                msg.sender,
+                ticker,
+                side,
+                amount,
+                averagePrice,
+                filled
+            );
+        }
     }
 
     function getOrders(bytes32 ticker, Side side)
