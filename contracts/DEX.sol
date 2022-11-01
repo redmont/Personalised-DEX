@@ -2,29 +2,20 @@
 
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./baseContract.sol";
 
-contract Dex {
+contract Dex is Helper {
     /* This contract has following functionalities
      1. Create new tokens
      2. Deposit/Withdraw Token 
      */
-
-    struct token {
-        bytes3 ticker; // Limiting the ticker length to 3 bytes max
-        string tokenName; // User friendly token name
-        address tokenAddress;
-    }
-
-    address public owner;
-    mapping(bytes3 => token) public tokens;
-    bytes3[] public tokensList;
 
     constructor() {
         owner = msg.sender;
     }
 
     function addNewToken(
-        bytes3 ticker,
+        bytes32 ticker,
         string memory tokenName,
         address tokenAddress
     ) external isTickerAvailable(ticker) isOwner {
@@ -33,10 +24,10 @@ contract Dex {
         tokensList.push(ticker);
     }
 
-    mapping(address => mapping(bytes3 => uint256)) tradersBalances;
+    mapping(address => mapping(bytes32 => uint256)) tradersBalances;
 
     // confusion
-    function deposit(bytes3 ticker, uint256 amount)
+    function deposit(bytes32 ticker, uint256 amount)
         external
         isTokenExist(ticker)
     {
@@ -50,7 +41,7 @@ contract Dex {
         tradersBalances[msg.sender][ticker] += amount;
     }
 
-    function withdraw(bytes3 ticker, uint256 amount)
+    function withdraw(bytes32 ticker, uint256 amount)
         external
         isTokenExist(ticker)
     {
@@ -63,22 +54,5 @@ contract Dex {
 
         // record transaction in DEX ledger
         tradersBalances[msg.sender][ticker] -= amount;
-    }
-
-    modifier isTokenExist(bytes3 ticker) {
-        require(tokens[ticker].ticker != bytes3(0), "The token does not exist");
-        _;
-    }
-
-    modifier isTickerAvailable(bytes3 ticker) {
-        require(
-            tokens[ticker].ticker == bytes3(0),
-            "The ticker is already taken"
-        );
-        _;
-    }
-    modifier isOwner() {
-        require(msg.sender == owner, "You are not the owner");
-        _;
     }
 }
