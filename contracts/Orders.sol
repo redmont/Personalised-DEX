@@ -17,6 +17,8 @@ contract OrdersManagement is Helper, traders {
         BUY,
         SELL
     }
+    uint256 lastOrderID;
+
     struct Order {
         uint256 id;
         address trader;
@@ -27,7 +29,14 @@ contract OrdersManagement is Helper, traders {
         uint256 filledAmount;
     }
 
-    uint256 lastOrderID;
+    event NewTrade(
+        address trader,
+        bytes32 ticker,
+        Side side,
+        uint256 amount,
+        uint256 averagePrice,
+        uint256 filled
+    );
 
     mapping(bytes32 => mapping(Side => Order[])) OrderBook;
 
@@ -99,6 +108,11 @@ contract OrdersManagement is Helper, traders {
 
         uint256 tradeRemainingToBefilled;
         int256 i = (side == Side.BUY) ? int256(0) : int256(orders.length) - 1;
+
+        // to calculate average price
+        uint256 totalPrice;
+        uint256 totalTrades;
+
         while (
             tradeRemainingToBefilled != 0 && i > -1 && i < int256(orders.length)
         ) {
@@ -155,9 +169,17 @@ contract OrdersManagement is Helper, traders {
             tradeRemainingToBefilled -= processAmount;
             clearOrderBook(orders, side);
 
+            totalPrice += currentOrder.price;
+            totalTrades++;
+
             // if buy order, iterate to right and vice versa
             side == Side.BUY ? i++ : i--;
         }
+
+        uint256 filled = ((amount - tradeRemainingToBefilled) * 100) / amount;
+        uint256 averagePrice = totalPrice / totalTrades;
+
+        emit NewTrade(msg.sender, ticker, side, amount, averagePrice, filled);
     }
 
     function getOrders(bytes32 ticker, Side side)
