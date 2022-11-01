@@ -158,6 +158,8 @@ contract OrdersManagement is Helper, traders {
         }
     }
 
+    // Remove orders that are filled from order book
+
     function clearOrderBook(Order[] storage _orders, Side last_side)
         private
         returns (Order[] storage)
