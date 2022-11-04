@@ -102,14 +102,14 @@ contract OrdersManagement is Helper, Traders {
         }
 
         // Going through the Order Book to find the best match
-        // orders is an ascending array
+        // orders is an ascending array [4]
         // If buy order, then we interseted in lowest price. left to right in the array
         // If sell order, then we interseted in highest price. right to left in the array
         Order[] storage orders = OrderBook[ticker][
             side == Side.BUY ? Side.SELL : Side.BUY
         ];
-        uint256 tradeRemainingToBefilled = amount;
-        int256 i = (side == Side.BUY) ? int256(0) : int256(orders.length) - 1;
+        uint256 tradeRemainingToBefilled = amount; //2
+        int256 i = (side == Side.BUY) ? int256(0) : int256(orders.length) - 1; //0
 
         // to calculate average price
         uint256 totalPrice;
@@ -170,15 +170,16 @@ contract OrdersManagement is Helper, Traders {
             }
 
             tradeRemainingToBefilled -= processAmount;
-            clearOrderBook(orders, side);
 
             totalPrice += currentOrder.price;
             totalTrades++;
 
             // if buy order, iterate to right and vice versa
+
             side == Side.BUY ? i++ : i--;
         }
-        //require(0 == 1, Strings.toString(totalTrades));
+
+        clearOrderBook(orders, side);
 
         if (totalTrades > 0) {
             uint256 filled = ((amount - tradeRemainingToBefilled) * 100) /
@@ -214,9 +215,9 @@ contract OrdersManagement is Helper, Traders {
             ? int256(0)
             : int256(_orders.length) - 1;
         while (
-            _orders[uint256(i)].filledAmount == _orders[uint256(i)].amount &&
             i < int256(_orders.length) &&
-            i > -1
+            i > -1 &&
+            _orders[uint256(i)].filledAmount == _orders[uint256(i)].amount
         ) {
             if (last_side == Side.BUY) {
                 for (uint256 j = 0; j < (_orders.length) - 1; j++) {

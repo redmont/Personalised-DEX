@@ -31,6 +31,7 @@ contract Dex is Helper, Traders, OrdersManagement {
         external
         isTokenExist(ticker)
     {
+        // this is using interface to call transferFrom func of token contract
         IERC20(tokens[ticker].tokenAddress).transferFrom(
             msg.sender,
             address(this),

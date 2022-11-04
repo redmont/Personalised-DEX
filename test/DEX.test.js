@@ -9,7 +9,7 @@ const fakeToken2 = artifacts.require("fakeToken2");
 contract("Dex", (accounts) => {
     const amount = web3.utils.toWei("100");
     let DEX, DAI, FT1, FT2;
-    let [trader1, trader2] = [accounts[1], accounts[2]];
+    const [trader1, trader2] = [accounts[1], accounts[2]];
 
     before(async () => {
         // Deploy all fake tokens contract
