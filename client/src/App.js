@@ -30,8 +30,8 @@ function App({ web3, accounts, contracts }) {
             .tradersBalances(account, web3.utils.fromAscii(token.ticker))
             .call();
         console.log(contracts);
-        console.log(contracts[token.value]);
-        const tokenWallet = await contracts[token.value].methods
+        console.log(token);
+        const tokenWallet = await contracts[token.ticker].methods
             .balanceOf(account)
             .call();
         return { tokenDex, tokenWallet };
@@ -67,6 +67,7 @@ function App({ web3, accounts, contracts }) {
     };
 
     const selectToken = (token) => {
+        console.log(token);
         setUser({ ...user, selectedToken: token });
     };
 
