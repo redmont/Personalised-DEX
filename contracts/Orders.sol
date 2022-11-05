@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import "./baseContract.sol";
 import "./Traders.sol";
+import "hardhat/console.sol";
 
 contract OrdersManagement is Helper, Traders {
     /* This contract has following functionalities
@@ -87,7 +88,7 @@ contract OrdersManagement is Helper, Traders {
         bytes32 ticker,
         Side side,
         uint256 amount
-    ) external isTokenExist(ticker) {
+    ) public isTokenExist(ticker) {
         if (side == Side.BUY) {
             // Right now we don't know how much DAI tokens are required
         } else {
@@ -141,7 +142,7 @@ contract OrdersManagement is Helper, Traders {
             }
 
             // upadate order book
-            orders[uint256(i)].filledAmount += tradeRemainingToBefilled;
+            orders[uint256(i)].filledAmount += processAmount;
 
             if (side == Side.BUY) {
                 // update market order trader's balance
