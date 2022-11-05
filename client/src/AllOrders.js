@@ -15,19 +15,13 @@ function AllOrders({ orders }) {
                         <tr>
                             <th>amount</th>
                             <th>price</th>
-                            <th>date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {orders.map((order) => (
                             <tr key={order.id}>
-                                <td>{order.amount - order.filled}</td>
+                                <td>{order.amount - order.filledAmount}</td>
                                 <td>{order.price}</td>
-                                <td>
-                                    <Moment fromNow>
-                                        {parseInt(order.date) * 1000}
-                                    </Moment>
-                                </td>
                             </tr>
                         ))}
                     </tbody>

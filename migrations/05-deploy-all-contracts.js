@@ -39,7 +39,7 @@ module.exports = async function (deployer, networks, accounts) {
     // and deposit some into exchange
 
     const amount = web3.utils.toWei("100");
-    const depositAmount = web3.utils.toWei("100");
+    const depositAmount = web3.utils.toWei("50");
 
     const seedTokenBalance = async (tokenContract, trader) => {
         // Adding faucet of fake tokens to traders

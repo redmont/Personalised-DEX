@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NewOrder from "./NewOrder.js";
 import AllOrders from "./AllOrders.js";
 import Wallet from "./Wallet.js";
+import Header from "./Header.js";
 
 const SIDE = {
     BUY: 0,
@@ -24,12 +25,13 @@ function App({ web3, accounts, contracts }) {
     });
     const [trades, setTrades] = useState([]);
     const [listener, setListener] = useState(undefined);
-    console.log(contracts);
     const getBalances = async (account, token) => {
         const tokenDex = await contracts.dex.methods
             .tradersBalances(account, web3.utils.fromAscii(token.ticker))
             .call();
-        const tokenWallet = await contracts[token.ticker].methods
+        console.log(contracts);
+        console.log(contracts[token.value]);
+        const tokenWallet = await contracts[token.value].methods
             .balanceOf(account)
             .call();
         return { tokenDex, tokenWallet };
@@ -72,8 +74,9 @@ function App({ web3, accounts, contracts }) {
         await contracts[user.selectedToken.ticker].methods
             .approve(contracts.dex.options.address, amount)
             .send({ from: user.accounts[0] });
+        console.log(user.accounts);
         await contracts.dex.methods
-            .deposit(amount, web3.utils.fromAscii(user.selectedToken.ticker))
+            .deposit(web3.utils.asciiToHex(user.selectedToken.ticker), amount)
             .send({ from: user.accounts[0] });
         const balances = await getBalances(
             user.accounts[0],
@@ -84,7 +87,7 @@ function App({ web3, accounts, contracts }) {
 
     const withdraw = async (amount) => {
         await contracts.dex.methods
-            .withdraw(amount, web3.utils.fromAscii(user.selectedToken.ticker))
+            .withdraw(web3.utils.fromAscii(user.selectedToken.ticker), amount)
             .send({ from: user.accounts[0] });
         const balances = await getBalances(
             user.accounts[0],
@@ -95,10 +98,10 @@ function App({ web3, accounts, contracts }) {
 
     const createMarketOrder = async (amount, side) => {
         await contracts.dex.methods
-            .createMarketOrder(
+            .MarketOrder(
                 web3.utils.fromAscii(user.selectedToken.ticker),
-                amount,
                 side,
+                amount,
             )
             .send({ from: user.accounts[0] });
         const orders = await getOrders(user.selectedToken);
@@ -107,11 +110,11 @@ function App({ web3, accounts, contracts }) {
 
     const createLimitOrder = async (amount, price, side) => {
         await contracts.dex.methods
-            .createLimitOrder(
+            .LimitOrder(
                 web3.utils.fromAscii(user.selectedToken.ticker),
+                side,
                 amount,
                 price,
-                side,
             )
             .send({ from: user.accounts[0] });
         const orders = await getOrders(user.selectedToken);
@@ -164,6 +167,12 @@ function App({ web3, accounts, contracts }) {
 
     return (
         <div id="app">
+            <Header
+                contracts={contracts}
+                tokens={tokens}
+                user={user}
+                selectToken={selectToken}
+            />
             <main className="container-fluid">
                 <div className="row">
                     <div className="col-sm-4 first-col"></div>
