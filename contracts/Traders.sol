@@ -10,7 +10,7 @@ contract Traders is Helper {
      2. Create Market order
      */
 
-    mapping(address => mapping(bytes32 => uint256)) tradersBalances;
+    mapping(address => mapping(bytes32 => uint256)) public tradersBalances;
 
     function getBalance(bytes32 ticker, address traderAddress)
         public

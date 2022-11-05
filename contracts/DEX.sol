@@ -16,6 +16,18 @@ contract Dex is Helper, Traders, OrdersManagement {
         owner = msg.sender;
     }
 
+    function getTokens() external view returns (token[] memory) {
+        token[] memory _tokens = new token[](tokensList.length);
+        for (uint256 i = 0; i < tokensList.length; i++) {
+            _tokens[i] = token(
+                tokens[tokensList[i]].ticker,
+                tokens[tokensList[i]].tokenName,
+                tokens[tokensList[i]].tokenAddress
+            );
+        }
+        return _tokens;
+    }
+
     function addNewToken(
         bytes32 ticker,
         string memory tokenName,
