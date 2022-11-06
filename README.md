@@ -13,3 +13,4 @@ Features:
 - Withdrawl tokens
 - See OrderBook (Buy & Sell)
 - Multiple tokens support
+- Listening to new trade events
