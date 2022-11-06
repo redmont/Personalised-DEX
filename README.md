@@ -1,6 +1,8 @@
 # Personalised-DEX
 Basic Decentralised exchange project I made for learning purpose
 
+Stack: Solidity, React, Truffle.
+
 To run:
 truffle migrate && cd client && npm start
 
